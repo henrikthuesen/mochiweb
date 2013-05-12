@@ -1,0 +1,14 @@
+OSX-Reloader
+
+On OSX, it seems that the timer:send_interval/2 will try to catch lost
+ticks from when the system was sleeping (suspended). This will produce
+high CPU usage for a while after resume.
+
+To counteract this, this branch modifies the reloader.erl in such a
+was that no fixed schedule is set up. Instead each iteration of the
+reloader will schedule a new one-time execution (send a one-time
+message to the process). Therefore no more that one tick is "skipped"
+when the system goes to sleep and resumes.
+
+The change is only tested on my system (Mac OS X 10.7.5) with Erlang
+R16B.

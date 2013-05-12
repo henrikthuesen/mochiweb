@@ -40,7 +40,7 @@ stop() ->
 %% @spec init([]) -> {ok, State}
 %% @doc gen_server init, opens the server in an initial state.
 init([]) ->
-    {ok, TRef} = timer:send_interval(timer:seconds(1), doit),
+    {ok, TRef} = timer:send_after(timer:seconds(1), doit),
     {ok, #state{last = stamp(), tref = TRef}}.
 
 %% @spec handle_call(Args, From, State) -> tuple()
@@ -60,7 +60,8 @@ handle_cast(_Req, State) ->
 handle_info(doit, State) ->
     Now = stamp(),
     _ = doit(State#state.last, Now),
-    {noreply, State#state{last = Now}};
+    {ok, TRef} = timer:send_after(timer:seconds(1), doit),
+    {noreply, State#state{last = Now, tref = TRef}};
 handle_info(_Info, State) ->
     {noreply, State}.
 
